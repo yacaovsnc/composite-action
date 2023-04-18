@@ -1,7 +1,24 @@
-name: composite-action
-description: test composite-action
+name: 'Composite Action'
+description: "Echo a secret"
+secrets:
+  description: Secrets toJson available in runtime workspace
+  required: true
+  
 runs:
-  using: composite
+  using: "composite"
   steps:
-    - run: echo "Running composite action"
+    - name: echo secret
+      env:
+        TOKEN: ${{ fromJSON(inputs.secrets).my_token }}
+        GITHUB_TOKEN: ${{ fromJSON(inputs.secrets).my_token }} 
+      run:  | 
+        echo ${{ fromJSON(inputs.secrets).my_token }}  | head -c 10 #ThisIsMyTo
+        echo
+        echo ${{ fromJSON(inputs.secrets).MY_TOKEN }}  | head -c 10 #ThisIsMyTo / case insensitive
+        echo 
+        echo $TOKEN  | head -c 10 #ThisIsMyTo / env variable
+        echo 
+        echo ${{ fromJSON(inputs.secrets).GITHUB_TOKEN }} | head -c 20 #real GITHUB_TOKEN from input 
+        echo 
+        echo $GITHUB_TOKEN | head -c 10 # Overriden GITHUB_TOKEN which is really MY_TOKEN
       shell: bash
